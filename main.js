@@ -23,12 +23,18 @@
   $("bookBtn").href = S.bookingUrl;
   $("walk").textContent = S.walkIns ? "Walk-ins welcome too." : "";
   const max = Math.max(...S.services.map(s => s[2]));
-  $("prices").innerHTML = S.services.map(s => `<li><div class="row"><b>${s[0]}${s[3] ? '<span class="pop">POPULAR</span>' : ""}</b><span class="p" data-v="${s[1]}">${S.currency}0</span></div><div class="time" style="--w:${s[2] / max * 100}%"><i></i></div><span class="mins">${s[2]} min</span></li>`).join("");
+  const ICONS = {
+    scissors: '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="6" cy="18" r="2.4"/><path d="M8 7.5 19 17M8 16.5 19 7"/></svg>',
+    razor: '<svg viewBox="0 0 24 24"><path d="M6 3v12a3 3 0 0 0 6 0V3M6 7h6M4 21l5-6M9 21l5-6"/></svg>',
+    beard: '<svg viewBox="0 0 24 24"><path d="M7 4h10l1 7c0 5-3.2 9-6 9-1 0-1-2-2-2s-1 2-2 2c-2.8 0-6-4-6-9z"/></svg>'
+  };
+  const svcIcon = n => /shave|razor/i.test(n) ? ICONS.razor : /beard/i.test(n) ? ICONS.beard : ICONS.scissors;
+  $("prices").innerHTML = S.services.map((s, i) => `<li class="${s[3] ? "pop" : ""}" style="--d:${i * .08}s"><span class="sic">${svcIcon(s[0])}</span><div class="row"><b>${s[0]}</b><span class="p" data-v="${s[1]}">${S.currency}0</span></div><div class="time" style="--w:${s[2] / max * 100}%"><i></i></div><span class="mins">${s[2]} min${s[3] ? ' <i class="rb">Popular</i>' : ""}</span></li>`).join("");
   $("contact").textContent = `${S.address} · ${S.phone}`;
 
   /* ---------- video source (portrait -> mobile file) ---------- */
   let variant = null, dur = 10;
-  const pick = () => innerHeight > innerWidth ? "mobile" : "desktop";
+  const pick = () => innerWidth < 820 ? "mobile" : "desktop";  // width, not aspect: a narrow desktop window must still get the landscape video only below this breakpoint
   function load(v) {
     variant = v; const url = `${v}.mp4`;
     const E = window.EMBED; vid.poster = E ? E[v + "Poster"] : `${v}-poster.jpg`;
